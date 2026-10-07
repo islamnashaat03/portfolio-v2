@@ -46,6 +46,52 @@ if (matchMedia('(hover: hover) and (pointer: fine)').matches) {
   });
 }
 const arabic = document.documentElement.lang === 'ar';
+const serviceTabs = [...document.querySelectorAll('[data-service-tab]')];
+const serviceResults = document.querySelector('#service-results');
+function selectServiceTab(category, navigate = false, focus = false) {
+  const selected = serviceTabs.find(tab => tab.dataset.serviceTab === category) || serviceTabs[0];
+  if (!selected) return;
+  category = selected.dataset.serviceTab;
+  let count = 0;
+  serviceResults.querySelectorAll('[data-service-group]').forEach(card => {
+    card.hidden = category !== 'all' && card.dataset.serviceGroup !== category;
+    if (!card.hidden) count++;
+  });
+  serviceTabs.forEach(tab => {
+    const active = tab === selected;
+    tab.setAttribute('aria-selected', String(active));
+    tab.tabIndex = active ? 0 : -1;
+  });
+  serviceResults.setAttribute('aria-labelledby', selected.id);
+  document.querySelector('#service-count').textContent = arabic ? `${count} خدمة` : `${count} services`;
+  if (navigate) history.pushState(null, '', category === 'all' ? location.pathname + location.search : '#' + category);
+  document.querySelector('a.language').hash = category === 'all' ? '' : category;
+  if (focus) selected.focus({preventScroll: true});
+  const strip = selected.parentElement;
+  const bounds = strip.getBoundingClientRect();
+  const tabBounds = selected.getBoundingClientRect();
+  const offset = tabBounds.left < bounds.left ? tabBounds.left - bounds.left : tabBounds.right > bounds.right ? tabBounds.right - bounds.right : 0;
+  strip.scrollBy({left: offset, behavior: 'instant'});
+}
+serviceTabs.forEach((tab, index) => {
+  tab.addEventListener('click', () => selectServiceTab(tab.dataset.serviceTab, true));
+  tab.addEventListener('keydown', event => {
+    let next;
+    if (event.key === 'Home') next = 0;
+    if (event.key === 'End') next = serviceTabs.length - 1;
+    if (event.key === 'ArrowRight') next = (index + (arabic ? -1 : 1) + serviceTabs.length) % serviceTabs.length;
+    if (event.key === 'ArrowLeft') next = (index + (arabic ? 1 : -1) + serviceTabs.length) % serviceTabs.length;
+    if (next === undefined) return;
+    event.preventDefault();
+    selectServiceTab(serviceTabs[next].dataset.serviceTab, true, true);
+  });
+});
+if (serviceTabs.length) {
+  const syncServiceTab = () => selectServiceTab(location.hash.slice(1));
+  syncServiceTab();
+  window.addEventListener('popstate', syncServiceTab);
+  window.addEventListener('hashchange', syncServiceTab);
+}
 const toggle = document.querySelector('.menu-toggle');
 const nav = document.querySelector('#navigation');
 toggle?.addEventListener('click', () => {
