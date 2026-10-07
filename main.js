@@ -1,4 +1,50 @@
 'use strict';
+// One-shot motion leaves content visible if scripting or animation fails.
+const motionPreference = matchMedia('(prefers-reduced-motion: reduce)');
+const activeMotion = new Set();
+function playEntrance(element, delay = 0) {
+  if (motionPreference.matches || !element.animate) return;
+  const animation = element.animate([
+    {opacity: 0, transform: 'translateY(14px)'},
+    {opacity: 1, transform: 'translateY(0)'}
+  ], {duration: 600, delay, easing: 'cubic-bezier(.16,1,.3,1)'});
+  activeMotion.add(animation);
+  animation.finished.then(() => activeMotion.delete(animation)).catch(() => activeMotion.delete(animation));
+}
+document.querySelectorAll('.hero-main > h1, .hero-main > h2, .hero-intro, .hero-main > .actions').forEach((element, index) => playEntrance(element, index * 65));
+if ('IntersectionObserver' in window) {
+  const reveal = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        playEntrance(entry.target);
+        reveal.unobserve(entry.target);
+      }
+    });
+  }, {threshold: 0.08});
+  document.querySelectorAll('.project, .service-card').forEach(element => reveal.observe(element));
+}
+motionPreference.addEventListener('change', () => {
+  if (motionPreference.matches) activeMotion.forEach(animation => animation.cancel());
+});
+if (matchMedia('(hover: hover) and (pointer: fine)').matches) {
+  document.querySelectorAll('.project, .service-card').forEach(element => {
+    let frame = 0;
+    let pointerX = 0;
+    let pointerY = 0;
+    element.addEventListener('pointermove', event => {
+      if (motionPreference.matches) return;
+      const rect = element.getBoundingClientRect();
+      pointerX = event.clientX - rect.left;
+      pointerY = event.clientY - rect.top;
+      if (!frame) frame = requestAnimationFrame(() => {
+        element.style.setProperty('--glow-x', `${pointerX}px`);
+        element.style.setProperty('--glow-y', `${pointerY}px`);
+        frame = 0;
+      });
+    });
+    element.addEventListener('pointerleave', () => {cancelAnimationFrame(frame); frame = 0;});
+  });
+}
 const arabic = document.documentElement.lang === 'ar';
 const toggle = document.querySelector('.menu-toggle');
 const nav = document.querySelector('#navigation');
