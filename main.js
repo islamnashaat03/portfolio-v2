@@ -11,7 +11,7 @@ function playEntrance(element, delay = 0) {
   activeMotion.add(animation);
   animation.finished.then(() => activeMotion.delete(animation)).catch(() => activeMotion.delete(animation));
 }
-document.querySelectorAll('.hero-main > h1, .hero-main > h2, .hero-intro, .hero-main > .actions').forEach((element, index) => playEntrance(element, index * 65));
+document.querySelectorAll('.hero-emblem, .hero-main > h1, .hero-main > h2, .hero-intro, .hero-main > .actions, .hero-main > .availability, .hero-stats').forEach((element, index) => playEntrance(element, index * 100));
 if ('IntersectionObserver' in window) {
   const reveal = new IntersectionObserver(entries => {
     entries.forEach(entry => {
@@ -94,22 +94,80 @@ if (serviceTabs.length) {
 }
 const toggle = document.querySelector('.menu-toggle');
 const nav = document.querySelector('#navigation');
-toggle?.addEventListener('click', () => {
-  const open = toggle.getAttribute('aria-expanded') !== 'true';
-  toggle.setAttribute('aria-expanded', String(open));
-  nav.classList.toggle('open', open);
-});
-nav?.addEventListener('click', event => {
-  if (event.target.closest('a')) {
-    nav.classList.remove('open');
-    toggle.setAttribute('aria-expanded', 'false');
+const mobileNavigation = matchMedia('(max-width: 760px)');
+const menuBackground = [...document.querySelectorAll('main, footer, .whatsapp, .site-header')];
+const headerInner = document.querySelector('.header-inner');
+const menuOverlay = document.createElement('div');
+menuOverlay.className = 'mobile-menu-panel';
+menuOverlay.id = 'mobile-menu-panel';
+menuOverlay.setAttribute('role','dialog');
+menuOverlay.setAttribute('aria-modal','true');
+menuOverlay.setAttribute('aria-label',arabic?'القائمة الرئيسية':'Main navigation');
+menuOverlay.inert = true;
+const menuTop = document.createElement('div');
+menuTop.className = 'mobile-menu-top';
+const menuBrand = document.querySelector('.site-header .brand')?.cloneNode(true);
+if(menuBrand) menuTop.append(menuBrand);
+const menuClose = document.createElement('button');
+menuClose.className='menu-close';
+menuClose.innerHTML=`${arabic?'إغلاق':'Close'} <span class="close-icon" aria-hidden="true"></span>`;
+menuTop.append(menuClose);menuOverlay.append(menuTop);
+const menuQuote = document.createElement('a');
+menuQuote.className = 'button mobile-menu-quote';
+menuQuote.href = document.querySelector('.site-header a[href$="services/index.html"]')?.href || 'services/index.html';
+menuQuote.textContent = arabic ? 'اطلب عرض سعر' : 'Get a quote';
+menuOverlay.append(menuQuote);document.body.append(menuOverlay);
+let menuSequence=0;
+let menuCleanup;
+function setMenu(open, restoreFocus=false) {
+  if(!toggle||!nav)return;
+  open = open && mobileNavigation.matches;
+  ++menuSequence;clearTimeout(menuCleanup);
+  toggle.setAttribute('aria-expanded',String(open));
+  menuOverlay.classList.toggle('is-open',open);
+  menuOverlay.inert=!open;
+  if(open) {
+    document.body.classList.add('menu-is-open');
+    menuBackground.forEach(el=>el.inert=true);
+    menuClose.focus({preventScroll:true});
+  } else {
+    // Keep the page still while the panel quietly fades out.
+    menuCleanup=setTimeout(()=>{
+      document.body.classList.remove('menu-is-open');
+      menuBackground.forEach(el=>el.inert=false);
+      if(restoreFocus)toggle.focus({preventScroll:true});
+    },motionPreference.matches?0:320);
   }
+}
+function placeNavigation(){
+  setMenu(false);
+  if(mobileNavigation.matches){menuOverlay.insertBefore(nav,menuQuote);toggle.setAttribute('aria-controls','mobile-menu-panel');}
+  else{headerInner.append(nav);toggle.setAttribute('aria-controls','navigation');}
+}
+toggle?.addEventListener('click',()=>setMenu(true));
+menuClose.addEventListener('click',()=>setMenu(false,true));
+nav?.addEventListener('click',event=>{
+  const link=event.target.closest('a');
+  if(!link||!mobileNavigation.matches)return;
+  const destination=new URL(link.href);
+  if(destination.pathname===location.pathname && destination.hash){
+    event.preventDefault();setMenu(false);
+    setTimeout(()=>{
+      history.pushState(null,'',destination.hash);
+      document.querySelector(destination.hash)?.scrollIntoView({behavior:motionPreference.matches?'instant':'smooth'});
+    },motionPreference.matches?0:330);
+  }else setMenu(false);
 });
-document.addEventListener('keydown', event => {
-  if (event.key === 'Escape' && nav?.classList.contains('open')) {
-    nav.classList.remove('open');
-    toggle.setAttribute('aria-expanded', 'false');
-    toggle.focus();
+mobileNavigation.addEventListener('change',placeNavigation);
+placeNavigation();
+document.addEventListener('keydown',event=>{
+  if(!menuOverlay.classList.contains('is-open'))return;
+  if(event.key==='Escape'){event.preventDefault();setMenu(false,true);}
+  if(event.key==='Tab'){
+    const items=[...menuOverlay.querySelectorAll('a,button')];
+    const first=items[0],last=items[items.length-1];
+    if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus();}
+    else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus();}
   }
 });
 const filterButtons = document.querySelectorAll('[data-filter]');
@@ -151,3 +209,73 @@ form?.addEventListener('submit', async event => {
     button.disabled = false;
   }
 });
+
+const glassHeader = document.querySelector('.site-header');
+if (glassHeader && 'IntersectionObserver' in window) {
+  const boundary = document.createElement('div');
+  boundary.setAttribute('aria-hidden', 'true');
+  boundary.style.cssText = 'position:absolute;top:0;width:1px;height:180px;pointer-events:none';
+  document.body.prepend(boundary);
+  new IntersectionObserver(([entry]) => glassHeader.classList.toggle('is-scrolled', !entry.isIntersecting)).observe(boundary);
+}
+
+
+'use strict';
+
+// Final Matrix background: crisp glyphs everywhere, a few independently paced IN highlights.
+const matrixHero = document.querySelector('.home-page .hero');
+if (matrixHero) {
+  const matrixCanvas = document.createElement('canvas');
+  matrixCanvas.className='matrix-canvas';matrixCanvas.setAttribute('aria-hidden','true');
+  matrixHero.prepend(matrixCanvas);
+  const context=matrixCanvas.getContext('2d');
+  if(context){
+    let width=0,height=0,clock=0,frame=0,last=0,visible=true;
+    const seed=n=>((Math.sin(n*127.1+19.7)*43758.5453)%1+1)%1;
+    const glyphs=['{','}','[',']','<','>','/',';','=',':','&','|'];
+    function draw(){
+      context.clearRect(0,0,width,height);
+      context.textAlign='center';context.font='12px monospace';context.shadowBlur=0;
+      const spacing=width<600?36:44;
+      const columns=Math.ceil(width/spacing);
+      for(let col=0;col<columns;col++){
+        const x=col*spacing+18;
+        const speed=10+seed(col+70)*24;
+        const range=height+200;
+        const head=(seed(col+20)*range+clock*speed)%range-70;
+        for(let n=0;n<8;n++){
+          const y=head-n*24;
+          if(y<0||y>height)continue;
+          context.fillStyle=`rgba(215,237,135,${.035+(1-n/9)*.08})`;
+          context.fillText(glyphs[(col*5+n*3)%glyphs.length],x,y);
+        }
+        if(col%6===2){
+          // Independent speed, separate from the column, without flashing.
+          const y=(seed(col+130)*range+clock*(19+seed(col+150)*31))%range-70;
+          const alpha=.38+Math.sin(clock*.6+col)*.1;
+          context.font='600 13px monospace';
+          context.fillStyle=`rgba(215,237,135,${alpha})`;
+          context.shadowColor='rgba(215,237,135,.55)';context.shadowBlur=8;
+          context.fillText('IN',x,y);context.shadowBlur=0;context.font='12px monospace';
+        }
+      }
+    }
+    function tick(now){
+      if(now-last>=40){clock+=Math.min((now-last)/1000,.1);last=now;draw();}
+      frame=requestAnimationFrame(tick);
+    }
+    function sync(){
+      cancelAnimationFrame(frame);last=performance.now();draw();
+      if(visible&&!document.hidden&&!motionPreference.matches)frame=requestAnimationFrame(tick);
+    }
+    function resize(){
+      width=matrixHero.clientWidth;height=matrixHero.clientHeight;
+      const ratio=Math.min(devicePixelRatio||1,2);
+      matrixCanvas.width=Math.round(width*ratio);matrixCanvas.height=Math.round(height*ratio);
+      context.setTransform(ratio,0,0,ratio,0,0);sync();
+    }
+    new ResizeObserver(resize).observe(matrixHero);
+    new IntersectionObserver(([entry])=>{visible=entry.isIntersecting;sync();}).observe(matrixHero);
+    document.addEventListener('visibilitychange',sync);motionPreference.addEventListener('change',sync);resize();
+  }
+}
