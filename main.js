@@ -141,6 +141,7 @@ form?.addEventListener('submit', async event => {
     const response = await fetch(form.action, {method: 'POST', body: new FormData(form), headers: {Accept: 'application/json'}, signal: controller.signal});
     const data = await response.json().catch(() => ({}));
     if (!response.ok || data.errors) throw new Error('Submission failed');
+    window.trackPortfolioEvent?.('generate_lead', {method: 'contact_form'});
     form.reset();
     status.textContent = arabic ? 'تم استلام رسالتك بنجاح. سأرد عليك في أقرب وقت.' : 'Your message was received successfully. I’ll reply as soon as I can.';
   } catch (error) {
