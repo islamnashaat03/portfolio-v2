@@ -12,7 +12,7 @@ class Links(HTMLParser):
         if 'id' in a:self.ids.append(a['id'])
         if tag=='h1':self.h1+=1
         if tag=='html':self.lang=a.get('lang')
-pages=[root/'index.html',root/'performance.html',*list((root/'projects').glob('*.html')),*list((root/'services').glob('*.html')),*list((root/'ar').rglob('*.html'))]
+pages=[root/'index.html',root/'review.html',root/'performance.html',*list((root/'projects').glob('*.html')),*list((root/'services').glob('*.html')),*list((root/'ar').rglob('*.html'))]
 errors=[]
 for p in pages:
     h=Links();h.feed(p.read_text(encoding='utf-8'))

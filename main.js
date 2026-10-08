@@ -199,9 +199,11 @@ form?.addEventListener('submit', async event => {
     const response = await fetch(form.action, {method: 'POST', body: new FormData(form), headers: {Accept: 'application/json'}, signal: controller.signal});
     const data = await response.json().catch(() => ({}));
     if (!response.ok || data.errors) throw new Error('Submission failed');
-    window.trackPortfolioEvent?.('generate_lead', {method: 'contact_form'});
+    if (!form.dataset.review) window.trackPortfolioEvent?.('generate_lead', {method: 'contact_form'});
     form.reset();
-    status.textContent = arabic ? 'تم استلام رسالتك بنجاح. سأرد عليك في أقرب وقت.' : 'Your message was received successfully. I’ll reply as soon as I can.';
+    status.textContent = form.dataset.review
+      ? (arabic ? 'شكرًا لتقييمك. تم استلامه للمراجعة وفق تفضيل النشر الذي اخترته.' : 'Thank you. Your review was received for review according to your publication preference.')
+      : (arabic ? 'تم استلام رسالتك بنجاح. سأرد عليك في أقرب وقت.' : 'Your message was received successfully. I’ll reply as soon as I can.');
   } catch (error) {
     status.textContent = arabic ? 'تعذّر إرسال الرسالة. جرّب مرة أخرى أو تواصل عبر واتساب أو البريد الإلكتروني.' : 'Your message could not be sent. Please try again, or contact me by WhatsApp or email.';
   } finally {
