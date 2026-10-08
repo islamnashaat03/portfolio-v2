@@ -1,8 +1,17 @@
 import json
 from pathlib import Path
 from html import escape as esc
+import re
 
 ROOT = Path(__file__).parent
+
+def footer_controls(page, cv, ar=False):
+    svg=lambda path:f'<svg viewBox="0 0 24 24" aria-hidden="true">{path}</svg>'
+    linkedin=svg('<path d="M5 9v11M5 4v.1M10 20V9h4v2c1-3 6-3 6 2v7M14 12v8"/>')
+    github=svg('<path d="M9 20c-5 1-5-3-7-3m14 5v-4c0-1-.3-2-1-2 4-.5 7-2 7-6a6 6 0 0 0-2-4c.3-1 0-3 0-3s-2 0-4 2a15 15 0 0 0-8 0C6 3 4 3 4 3s-.3 2 0 3a6 6 0 0 0-2 4c0 4 3 5.5 7 6-.7.5-1 1-1 2v4"/>')
+    download=svg('<path d="M12 3v12m-5-5 5 5 5-5M4 16v5h16v-5"/>')
+    links=f'<div class="footer-controls"><a class="social-icon" href="https://www.linkedin.com/in/islam-nashaat03/" target="_blank" rel="noopener" aria-label="LinkedIn" title="LinkedIn">{linkedin}</a><a class="social-icon" href="https://github.com/islamnashaat03" target="_blank" rel="noopener" aria-label="GitHub" title="GitHub">{github}</a><a class="footer-cv" href="{cv}" download>{download}<span>{"تحميل السيرة الذاتية" if ar else "Download CV"}</span></a></div>'
+    return re.sub(r'(<footer\b[^>]*>.*?<p>.*?</p>)<div>.*?</div>(</footer>)',lambda m:m[1]+links+m[2],page,flags=re.S)
 
 def evidence(slug, ar=False, prefix='../'):
     manifest = ROOT/'images/performance/supplied/manifest.json'

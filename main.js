@@ -185,6 +185,24 @@ function filterProjects(category) {
 filterButtons.forEach(button => button.addEventListener('click', () => filterProjects(button.dataset.filter)));
 if (projectItems.length) filterProjects('all');
 const form = document.querySelector('#contact-form');
+function showFormResult(success, message) {
+  const inlineStatus=document.querySelector('#form-status');if(inlineStatus)inlineStatus.hidden=true;
+  let popup=document.querySelector('#form-result-dialog');
+  if(!popup){
+    popup=document.createElement('dialog');popup.id='form-result-dialog';popup.className='form-result-dialog';
+    popup.setAttribute('aria-labelledby','form-result-title');popup.setAttribute('aria-describedby','form-result-message');
+    popup.innerHTML='<div class="result-icon" aria-hidden="true"><svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="27"/><path class="result-check" d="m19 32 9 9 18-19"/><path class="result-error" d="m23 23 18 18m0-18-18 18"/></svg></div><h2 id="form-result-title"></h2><p id="form-result-message"></p><button class="button" type="button"></button>';
+    document.body.append(popup);
+    popup.querySelector('button').addEventListener('click',()=>popup.close());
+    popup.addEventListener('click',event=>{if(event.target===popup){const r=popup.getBoundingClientRect();if(event.clientX<r.left||event.clientX>r.right||event.clientY<r.top||event.clientY>r.bottom)popup.close();}});
+    popup.addEventListener('close',()=>{document.body.classList.remove('result-is-open');form?.querySelector('[type=submit]')?.focus({preventScroll:true});});
+  }
+  popup.dataset.state=success?'success':'error';
+  popup.querySelector('h2').textContent=success?(arabic?'تم الإرسال بنجاح':'Sent successfully'):(arabic?'تعذّر الإرسال':'Could not send');
+  popup.querySelector('p').textContent=message;
+  popup.querySelector('button').textContent=success?(arabic?'تمام':'Done'):(arabic?'العودة والمحاولة مجددًا':'Back to try again');
+  document.body.classList.add('result-is-open');popup.showModal();
+}
 form?.addEventListener('submit', async event => {
   event.preventDefault();
   if (!form.reportValidity()) return;
@@ -192,6 +210,7 @@ form?.addEventListener('submit', async event => {
   const status = document.querySelector('#form-status');
   if (button.disabled) return;
   button.disabled = true;
+  status.hidden=false;
   status.textContent = arabic ? 'جارٍ إرسال رسالتك…' : 'Sending your message…';
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 20000);
@@ -204,8 +223,10 @@ form?.addEventListener('submit', async event => {
     status.textContent = form.dataset.review
       ? (arabic ? 'شكرًا لتقييمك. تم استلامه للمراجعة وفق تفضيل النشر الذي اخترته.' : 'Thank you. Your review was received for review according to your publication preference.')
       : (arabic ? 'تم استلام رسالتك بنجاح. سأرد عليك في أقرب وقت.' : 'Your message was received successfully. I’ll reply as soon as I can.');
+    showFormResult(true,status.textContent);
   } catch (error) {
     status.textContent = arabic ? 'تعذّر إرسال الرسالة. جرّب مرة أخرى أو تواصل عبر واتساب أو البريد الإلكتروني.' : 'Your message could not be sent. Please try again, or contact me by WhatsApp or email.';
+    showFormResult(false,status.textContent);
   } finally {
     clearTimeout(timeout);
     button.disabled = false;
