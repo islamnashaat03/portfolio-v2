@@ -4,8 +4,10 @@ const motionPreference = matchMedia('(prefers-reduced-motion: reduce)');
 const activeMotion = new Set();
 function playEntrance(element, delay = 0) {
   if (motionPreference.matches || !element.animate) return;
+  // Text remains visible during mobile entry: never delay the initial paint.
+  const mobileHero = matchMedia('(max-width: 760px)').matches && element.closest('.hero');
   const animation = element.animate([
-    {opacity: 0, transform: 'translateY(14px)'},
+    {opacity: mobileHero ? 1 : 0, transform: 'translateY(14px)'},
     {opacity: 1, transform: 'translateY(0)'}
   ], {duration: 600, delay, easing: 'cubic-bezier(.16,1,.3,1)'});
   activeMotion.add(animation);
@@ -277,29 +279,40 @@ if (crystalSource) {
       context.textAlign = 'center';
       context.font = '12px monospace';
       const mobile = mobileBackdrop.matches;
-      const spacing = mobile ? 54 : 48;
+      const spacing = mobile ? 48 : 42;
       const intensity = heroVisible ? 1 : .55;
       const range = height + 160;
       for (let col = 0; col < Math.ceil(width / spacing); col++) {
         const x = col * spacing + 18;
-        const quietCenter = Math.abs(x / width - .5) < .27 ? .32 : 1;
-        const head = (seed(col + 20) * range + clock * (8 + seed(col + 70) * 15)) % range - 40;
-        for (let n = 0; n < (mobile ? 4 : 7); n++) {
+        const quietCenter = Math.abs(x / width - .5) < .27 ? .55 : 1;
+        const head = (seed(col + 20) * range + clock * (14 + seed(col + 70) * 20)) % range - 40;
+        for (let n = 0; n < (mobile ? 5 : 9); n++) {
           const y = head - n * 26;
           if (y < 0 || y > height) continue;
-          context.fillStyle = `rgba(215,237,135,${(.025 + (1 - n / 8) * .055) * quietCenter * intensity})`;
+          context.fillStyle = `rgba(215,237,135,${(.025 + (1 - n / 10) * .055) * quietCenter * intensity})`;
           context.fillText(glyphs[(col * 5 + n * 3) % glyphs.length], x, y);
         }
+      }
+      // Independent code fragments cross the middle at different speeds and
+      // directions, softly enough to keep the introduction readable.
+      const fragments = ['</>', '{ }', '[ ]', '=>', '&&', '( )', '++'];
+      for (let index = 0; index < (mobile ? 5 : 12); index++) {
+        const direction = index % 2 ? -1 : 1;
+        const x = width * (.2 + seed(index + 310) * .6) + Math.sin(clock * .18 + index) * (mobile ? 12 : 32);
+        const y = ((seed(index + 330) * range + direction * clock * (12 + seed(index + 350) * 20)) % range + range) % range - 40;
+        context.font = `${12 + index % 3 * 2}px monospace`;
+        context.fillStyle = `rgba(215,237,135,${(.065 + seed(index + 370) * .04) * intensity})`;
+        context.fillText(fragments[index % fragments.length], x, y);
       }
       if (!crystals.complete || !crystals.naturalWidth) return;
       context.globalCompositeOperation = 'screen';
       const selected = mobile ? [positions[0], positions[2], positions[4]] : positions;
       selected.forEach(([px, py], index) => {
         const view = views[mobile ? index * 2 : index];
-        const size = mobile ? 28 + index * 4 : 34 + seed(index + 200) * 15;
+        const size = mobile ? 20 + index * 3 : 24 + seed(index + 200) * 10;
         const crystalHeight = size * view[3] / view[2];
         const x = width * px + (mobile ? 0 : Math.sin(clock * .12 + index) * 9);
-        const y = (height * py + clock * (7 + seed(index + 220) * 6)) % range - 20;
+        const y = (height * py + clock * (20 + seed(index + 220) * 14)) % range - 20;
         context.globalAlpha = (mobile ? .14 : .22) * intensity;
         context.drawImage(crystals, ...view, x - size / 2, y - crystalHeight / 2, size, crystalHeight);
       });
@@ -307,8 +320,8 @@ if (crystalSource) {
       context.globalCompositeOperation = 'source-over';
     }
     function tick(now) {
-      // Desktop only, capped at 20 painted frames/second.
-      if (now - last >= 50) {
+      // Cap painted frames at 20 fps on desktop and 15 fps on mobile.
+      if (now - last >= (mobileBackdrop.matches ? 1000 / 15 : 50)) {
         clock += Math.min((now - last) / 1000, .1);
         last = now;
         draw();
@@ -320,7 +333,7 @@ if (crystalSource) {
       frame = 0;
       last = performance.now();
       draw();
-      if (pageActive && !document.hidden && !motionPreference.matches && !mobileBackdrop.matches) {
+      if (pageActive && !document.hidden && !motionPreference.matches) {
         frame = requestAnimationFrame(tick);
       }
     }
