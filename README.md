@@ -2,6 +2,11 @@
 
 Bilingual website: https://islamnashaat03.github.io/portfolio-v2/
 
+Arabic is the default: the root opens `ar/index.html`, preserving query values
+and anchors. The English homepage is `en.html`; English service pages keep
+their existing routes. Language links preserve the chosen service/template.
+Arabic pages use self-hosted Cairo WOFF2 files; the font license is bundled.
+
 Homepage website types: online stores, business websites and landing pages.
 All 14 existing USD starting prices are shown. Service pages include scope,
 previous-work templates, template customization and a custom-build option.

@@ -20,7 +20,7 @@ class Document(HTMLParser):
 homepages=[]
 allowed_services=set()
 for locale in ['', 'ar/']:
-    text=(root/(locale+'index.html')).read_text(encoding='utf-8')
+    text=(root/(locale+'index.html' if locale or career else 'en.html')).read_text(encoding='utf-8')
     doc=Document(text)
     homepages.append(doc)
     ids={a.get('id') for tag,a in doc.nodes}
@@ -42,7 +42,7 @@ for locale in ['', 'ar/']:
         allowed_services.update(a['value'] for tag,a in doc.nodes if tag=='option' and a.get('data-starting-price'))
         assert len(allowed_services)==14
 
-paths=[root/'index.html',root/'review.html',root/'performance.html',*sorted((root/'projects').glob('*.html')),*sorted((root/'services').glob('*.html')),*sorted((root/'ar').rglob('*.html'))]
+paths=[root/'en.html',root/'index.html',root/'review.html',root/'performance.html',*sorted((root/'projects').glob('*.html')),*sorted((root/'services').glob('*.html')),*sorted((root/'ar').rglob('*.html'))]
 quote_links=0
 for page in paths:
     text=page.read_text(encoding='utf-8')

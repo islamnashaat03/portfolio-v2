@@ -187,4 +187,14 @@ def adapt_page(page, profile, path, ar, projects, services):
         page = re.sub(r'<title>.*?</title>',f'<title>{E(title)} — Islam Nashaat</title>',page,count=1)
         page = re.sub(r'(<meta (?:name="description"|property="og:description") content=")[^"]*',lambda m:m[1]+E(desc),page)
         page = re.sub(r'(<meta property="og:title" content=")[^"]*',lambda m:m[1]+E(title)+' — Islam Nashaat',page)
+    if profile == 'services':
+        if not ar:
+            page = page.replace('href="'+prefix+'index.html', 'href="'+prefix+'en.html')
+        elif path == 'index.html':
+            page = page.replace('class="language" lang="en" href="../index.html"', 'class="language" lang="en" href="../en.html"')
     return page
+
+
+def default_arabic_page(base):
+    target = 'ar/index.html'
+    return f'''<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,follow"><link rel="canonical" href="{base}ar/index.html"><script>location.replace('ar/index.html'+location.search+location.hash);</script><meta http-equiv="refresh" content="0;url=ar/index.html"><title>إسلام نشأت — خدمات تطوير المواقع</title></head><body><main><h1>خدمات تطوير المواقع والمتاجر</h1><p><a href="{target}">الانتقال إلى الموقع بالعربية</a></p><a href="en.html" lang="en">English</a></main></body></html>'''
