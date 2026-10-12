@@ -1,17 +1,24 @@
-# Islam Nashaat — Services website
+# Islam Nashaat — Official services website
 
 Bilingual website: https://islamnashaat03.github.io/portfolio-v2/
 
-Synced from `my-portfolio` commit `f736dbc6e6f2ab6917077f8b35504acd3017c314` on 12 October 2026.
-The newer downloadable CV already published in v2 is retained.
-Historical performance evidence continues to refer to its originally tested URLs.
+Homepage website types: online stores, business websites and landing pages.
+All 14 existing USD starting prices are shown. Service pages include scope,
+previous-work templates, template customization and a custom-build option.
+Selection pre-fills the quote form and survives a language change. CV download
+actions are replaced by quote-form actions. The WhatsApp button uses its green
+brand color with continuous glow and a static reduced-motion alternative.
 
-This repository will become the services website. The separate `my-portfolio`
-repository will become a one-page portfolio highlighting projects, services,
-and skills. Both use the same visual design; layout changes are pending.
+Previous client projects are design starting points prepared with the new
+customer's content and identity, rather than downloadable client websites.
+Historical performance evidence keeps the originally measured URLs.
 
-GitHub Pages publishes the repository root on `main`. No custom domain is
-configured yet.
+Python 3.12+, standard library only. Regenerate with `python build_portfolio.py`,
+then run `python verify_portfolio.py` and `python verify_site_profiles.py`.
+`SITE_PROFILE = 'services'` selects the presentation in `site_profiles.py`.
+Set `PORTFOLIO_BASE_URL` when moving to a custom domain.
 
-Regenerate with `python build_portfolio.py` and validate with
-`python verify_portfolio.py`. Set `PORTFOLIO_BASE_URL` when moving to a domain.
+GitHub Pages publishes the repository root on `main`. The separate
+`my-portfolio` repository is the employment portfolio. No custom domain is
+configured yet. Forms use the existing Formspree endpoint; QA intercepts
+success/failure responses and does not send real test enquiries.
