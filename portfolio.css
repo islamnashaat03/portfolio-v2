@@ -157,6 +157,7 @@ html{scroll-behavior:smooth;scrollbar-gutter:stable}
 .hero-main>.availability{font-size:14px}
 .hero-emblem>span{animation:none;transform:none}
 .matrix-canvas{position:absolute;inset:0;z-index:0;width:100%;height:100%;pointer-events:none}
+@media(max-width:760px){.matrix-canvas{display:none}}
 .hero-content{z-index:1}.hero-main{text-shadow:0 2px 12px #111414}
 @media(max-width:760px){.hero-main>h1{font-size:clamp(44px,10vw,64px)}.hero-main>.hero-intro{font-size:17px}.home-page .hero::before{background-size:cover;background-repeat:no-repeat;opacity:.32}.hero-main>.availability{font-size:12px}}
 
@@ -232,6 +233,15 @@ footer .footer-controls{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
  .hero-main>.actions .button,.hero-main>.actions .quote-link{font-size:15px;min-height:54px;padding:13px 21px}
  .hero-main>.availability{font-size:16px;line-height:1.6}
 }
+/* Native mobile project carousel: swipe, keyboard focus and RTL scroll snapping. */
+@media(max-width:760px){
+  .project-grid{display:flex;gap:18px;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;scroll-padding-inline:2px;padding:4px 2px 20px;overscroll-behavior-x:contain;scrollbar-width:thin;scrollbar-color:var(--green) var(--surface)}
+  .project-grid>.project{flex:0 0 88%;min-width:0;scroll-snap-align:start;scroll-snap-stop:normal}
+  .project-grid>.project[hidden]{display:none}
+  .project-grid::-webkit-scrollbar{height:5px}
+  .project-grid::-webkit-scrollbar-track{background:var(--surface);border-radius:8px}
+  .project-grid::-webkit-scrollbar-thumb{background:var(--green);border-radius:8px}
+}
 
 /* Supplied visual identity and continuous, quiet crystal backdrop. */
 body{position:relative;isolation:isolate}
@@ -242,3 +252,11 @@ footer .brand-logo{width:36px;height:38px}
 .home-page .hero{background:transparent}
 .home-page .hero::before{display:none}
 @media(max-width:760px){.brand-logo{width:36px;height:38px}.matrix-canvas{display:block}}
+
+/* Keep the menu identity anchored to the current mobile header geometry. */
+@media(max-width:760px){
+ .mobile-menu-panel,.mobile-menu-panel.is-open{transform:none;transition:opacity .32s ease,visibility 0s .32s}
+ .mobile-menu-panel.is-open{transition-delay:0s}
+ .mobile-menu-top .brand{position:absolute;margin:0;inset-inline-start:auto}
+ .mobile-menu-top .menu-close{margin-inline-start:auto}
+}

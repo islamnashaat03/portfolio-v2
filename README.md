@@ -1,24 +1,17 @@
-# Islam Nashaat — Portfolio v2
+# Islam Nashaat — Services website
 
-English and Arabic portfolio comparison version.
+Bilingual website: https://islamnashaat03.github.io/portfolio-v2/
 
-- New site: https://islamnashaat03.github.io/portfolio-v2/
-- Previous site: https://islamnashaat03.github.io/my-portfolio/
+Synced from `my-portfolio` commit `f736dbc6e6f2ab6917077f8b35504acd3017c314` on 12 October 2026.
+The newer downloadable CV already published in v2 is retained.
+Historical performance evidence continues to refer to its originally tested URLs.
 
-Static HTML, CSS and JavaScript. Includes 23 project pages, 14 service pages,
-English/Arabic counterparts, CV download, and Formspree contact integration.
+This repository will become the services website. The separate `my-portfolio`
+repository will become a one-page portfolio highlighting projects, services,
+and skills. Both use the same visual design; layout changes are pending.
 
-## Preview
+GitHub Pages publishes the repository root on `main`. No custom domain is
+configured yet.
 
-Run `python -m http.server 8000` and open http://localhost:8000/.
-
-## Regenerate pages
-
-Requires Python 3.12 or newer. Set `PORTFOLIO_BASE_URL` to your deployment URL
-and run `python build_portfolio.py`, then `python verify_portfolio.py`.
-Source content and templates live in `build_portfolio.py` and
-`portfolio-data.json`. Styling is in `portfolio.css`.
-
-GitHub Pages publishes the root of the `main` branch. `.nojekyll` enables
-plain static delivery. The contact endpoint is configured in the page builder;
-an accepted submission does not by itself confirm inbox delivery.
+Regenerate with `python build_portfolio.py` and validate with
+`python verify_portfolio.py`. Set `PORTFOLIO_BASE_URL` when moving to a domain.
