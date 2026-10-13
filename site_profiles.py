@@ -78,7 +78,6 @@ def career_home(original, ar, projects, recent, cases, services):
 
 def service_areas(ar, by_slug):
     t = lambda en, arab: arab if ar else en
-    prefix = '../' if ar else ''
     areas = [
         ('stores','Online stores','المتاجر الإلكترونية','WooCommerce from $300 · Salla from $200','ووكومرس من 300$ · سلة من 200$','Product catalogs, checkout and a storefront adapted to your brand.','كتالوج منتجات وخطوات شراء وواجهة متجر مناسبة لهويتك.','rose-de-lora','services/stores.html'),
         ('business','Business websites','المواقع التعريفية','From $225','من 225$','Present your business, services and contact channels clearly.','اعرض نشاطك وخدماتك ووسائل التواصل بشكل واضح.','aleid','services/business-website.html'),
@@ -86,8 +85,7 @@ def service_areas(ar, by_slug):
     ]
     content = f'<section id="work" class="section wrap work-areas"><div class="section-head"><div><h2>{t("Find your starting point", "مجالات الأعمال")}</h2><p>{t("Choose your website type, explore previous-work templates, then customize one or request your own build.", "اختار نوع موقعك، وشاهد نماذج من الأعمال السابقة، ثم خصّص نموذجًا أو اطلب تنفيذًا خاصًا.")}</p></div></div><div class="area-list">'
     for key,en,arab,price_en,price_ar,desc_en,desc_ar,example,link in areas:
-        p = by_slug[example]
-        content += f'<article class="area-item"><a class="area-preview" href="{link}" aria-label="{t(en,arab)}"><img src="{prefix}{E(p["image"])}" alt="{E(p["name"])} — {t("previous work example", "نموذج من تنفيذ سابق")}" width="900" height="520" loading="lazy" decoding="async"></a><div class="area-content"><h3><a href="{link}">{t(en,arab)}</a></h3><p class="area-price" dir="{t("ltr","rtl")}">{t(price_en,price_ar)}</p><p>{t(desc_en,desc_ar)}</p><a class="button secondary" href="{link}">{t("Explore templates & scope", "شاهد النماذج ونطاق الخدمة")}</a></div></article>'
+        content += f'<article class="area-item"><div class="area-content"><h3><a href="{link}">{t(en,arab)}</a></h3><p class="area-price" dir="{t("ltr","rtl")}">{t(price_en,price_ar)}</p><p>{t(desc_en,desc_ar)}</p><a class="button secondary" href="{link}">{t("Explore templates & scope", "شاهد النماذج ونطاق الخدمة")}</a></div></article>'
     return content+'</div><p class="pricing-note">'+t('Starting prices are in USD for the published scope. Hosting, paid themes/plugins and platform fees are separate.','الأسعار المبدئية بالدولار للنطاق الموضّح. الاستضافة والقوالب والإضافات المدفوعة ورسوم المنصات منفصلة.')+'</p></section>'
 
 

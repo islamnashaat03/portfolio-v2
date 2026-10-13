@@ -378,6 +378,23 @@ input:focus,input:focus-visible,textarea:focus,textarea:focus-visible,select:foc
 /* Approved Cairo typography for Arabic; English keeps its existing faces. */
 html[lang=ar]{--font:'Cairo',Arial,sans-serif;--heading:'Cairo',Arial,sans-serif}
 
+/* Website types: compact cards, with previews kept in the template galleries. */
+.services-site .area-list{grid-template-columns:repeat(3,minmax(0,1fr));gap:24px}
+.services-site .area-item{display:block;padding:32px;border:1px solid var(--line);border-radius:12px;background:var(--surface);transition:border-color .22s ease,background-color .22s ease}
+.services-site .area-item:hover{border-color:#d7ed8770;background:#202720}
+.services-site .area-content{display:flex;flex-direction:column;height:100%}
+.services-site .area-content h3{font-size:28px;margin-bottom:18px}
+.services-site .area-price{font-size:20px;min-height:68px;margin-bottom:16px}
+.services-site .area-content>p:not(.area-price){flex:1;margin-bottom:28px}
+.services-site .area-content .button{width:100%;justify-content:center;margin-top:auto;font-size:15px;padding-inline:16px}
+@media(max-width:1050px) and (min-width:761px){.services-site .area-list{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:760px){
+ .services-site .area-list{grid-template-columns:1fr;gap:20px}
+ .services-site .area-item{padding:28px 24px}
+ .services-site .area-price{min-height:0}
+}
+@media(prefers-reduced-motion:reduce){.services-site .area-item{transition:none}}
+
 /* A personal portrait alongside the services introduction. */
 .services-site .hero-introduction{display:grid;grid-template-columns:minmax(0,1fr) minmax(280px,390px);gap:64px;align-items:center;pointer-events:auto}
 .services-site .hero-introduction .hero-main{max-width:none;margin:0;text-align:start}
