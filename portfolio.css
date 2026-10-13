@@ -378,6 +378,31 @@ input:focus,input:focus-visible,textarea:focus,textarea:focus-visible,select:foc
 /* Approved Cairo typography for Arabic; English keeps its existing faces. */
 html[lang=ar]{--font:'Cairo',Arial,sans-serif;--heading:'Cairo',Arial,sans-serif}
 
+/* A personal portrait alongside the services introduction. */
+.services-site .hero-introduction{display:grid;grid-template-columns:minmax(0,1fr) minmax(280px,390px);gap:64px;align-items:center;pointer-events:auto}
+.services-site .hero-introduction .hero-main{max-width:none;margin:0;text-align:start}
+.services-site .hero-introduction .hero-main>h1{font-size:clamp(40px,4.6vw,64px);line-height:1.16;margin-inline:0}
+.services-site .hero-introduction .hero-main>h2{font-size:clamp(24px,2.3vw,32px)}
+.services-site .hero-introduction .hero-main>.hero-intro{margin-inline:0;font-size:18px}
+.services-site .hero-introduction .hero-main>.actions{justify-content:flex-start}
+.services-site .hero-introduction .hero-main>.availability{font-size:15px;margin-inline:0}
+.services-site .hero-portrait{margin:0;width:100%;aspect-ratio:1;overflow:hidden;border:1px solid var(--line);border-radius:24px;background:#000;box-shadow:0 24px 80px #0004}
+.services-site .hero-portrait img{display:block;width:100%;height:100%;object-fit:cover}
+.services-site .hero-introduction+.hero-stats{max-width:none}
+@media(max-width:1000px) and (min-width:761px){
+ .services-site .hero-introduction{grid-template-columns:minmax(0,1fr) 300px;gap:32px}
+ .services-site .hero-introduction .hero-main>h1{font-size:42px}
+ .services-site .hero-introduction .hero-main>.hero-intro{font-size:17px}
+}
+@media(max-width:760px){
+ .services-site .hero-introduction{display:flex;flex-direction:column;gap:32px}
+ .services-site .hero-portrait{order:-1;width:min(62vw,260px);border-radius:20px}
+ .services-site .hero-introduction .hero-main{text-align:center}
+ .services-site .hero-introduction .hero-main>h1{font-size:clamp(34px,8vw,48px);line-height:1.25}
+ .services-site .hero-introduction .hero-main>.hero-intro{font-size:17px}
+ .services-site .hero-introduction .hero-main>.actions{justify-content:center}
+}
+
 /* Icon-only WhatsApp action on desktop and mobile. */
 .career-site .whatsapp,.services-site .whatsapp{width:54px;height:54px;padding:0;gap:0;justify-content:center;border-radius:50%;background:#25d366;border-color:#25d366;color:#062a16}
 .career-site .whatsapp:hover,.services-site .whatsapp:hover{background:#25d366;border-color:#25d366;color:#062a16}
